@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Primo Brands — Promotion Forecast Tool 2</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f6f9; min-height: 100vh; padding: 2rem 1rem; color: #1a1a2e; }
+  .container { max-width: 720px; margin: 0 auto; }
+  .header { margin-bottom: 2rem; }
+  .header h1 { font-size: 22px; font-weight: 600; color: #1a1a2e; }
+  .header p { font-size: 14px; color: #6b7280; margin-top: 4px; }
+  .card { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; padding: 1.5rem; margin-bottom: 1.25rem; }
+  .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: #9ca3af; margin-bottom: 1rem; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  @media (max-width: 560px) { .grid-2,.grid-3 { grid-template-columns: 1fr; } }
+  label { display: block; font-size: 13px; color: #6b7280; margin-bottom: 5px; }
+  select, input[type="number"] { width: 100%; height: 40px; border: 1px solid #d1d5db; border-radius: 8px; padding: 0 12px; font-size: 14px; color: #1a1a2e; background: #fff; outline: none; }
+  select:focus, input:focus { border-color: #203864; box-shadow: 0 0 0 3px rgba(32,56,100,0.08); }
+  .readonly { height: 40px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0 12px; font-size: 14px; font-weight: 600; color: #1a1a2e; background: #f0f4ff; display: flex; align-items: center; }
+  .bench-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+  .bench-item { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px 12px; }
+  .bench-item label { font-size: 12px; color: #9ca3af; margin-bottom: 2px; }
+  .bench-item .val { font-size: 15px; font-weight: 600; color: #4b5563; }
+  .metric { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1rem; }
+  .metric.dark { background: #1a1a2e; border-color: #1a1a2e; }
+  .metric-label { font-size: 12px; color: #9ca3af; margin-bottom: 6px; }
+  .metric.dark .metric-label { color: #6b7280; }
+  .metric-value { font-size: 26px; font-weight: 600; color: #1a1a2e; }
+  .metric.dark .metric-value { color: #fff; }
+  .metric-sub { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+  .metric.dark .metric-sub { color: #4b5563; }
+  .note { font-size: 12px; color: #9ca3af; padding: 10px 14px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; margin-top: 1rem; line-height: 1.6; }
+  .divider { border: none; border-top: 1px solid #f3f4f6; margin: 1rem 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <h1>Primo Brands — Promotion Forecast Tool 2</h1>
+    <p>Select mechanic type and enter budget — forecasts based on avg entries/members per day</p>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Inputs</div>
+    <div class="grid-2" style="margin-bottom:1rem;">
+      <div>
+        <label>Mechanic type</label>
+        <select id="mechanic">
+          <option value="sweepstakes">Sweepstakes</option>
+          <option value="receipt" selected>Receipt</option>
+          <option value="hybrid">Hybrid</option>
+        </select>
+      </div>
+      <div>
+        <label>Duration (days)</label>
+        <input type="number" id="duration" value="60" min="1" />
+      </div>
+    </div>
+    <div class="grid-2" style="margin-bottom:1rem;">
+      <div>
+        <label>Total promotion cost — build &amp; prize ($)</label>
+        <input type="number" id="buildCost" value="130000" min="0" />
+      </div>
+      <div>
+        <label>Total media cost ($) <span style="font-size:11px;color:#d1d5db;">optional</span></label>
+        <input type="number" id="mediaCost" value="0" min="0" />
+      </div>
+    </div>
+    <div>
+      <label>Total all-in cost</label>
+      <div class="readonly" id="totalCost">$130,000</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Benchmark averages for selected mechanic</div>
+    <div class="bench-grid">
+      <div class="bench-item">
+        <label>Avg entries / day</label>
+        <div class="val" id="bEntDay">453.1</div>
+      </div>
+      <div class="bench-item">
+        <label>Avg new members / day</label>
+        <div class="val" id="bMemDay">85.0</div>
+      </div>
+      <div class="bench-item">
+        <label>Avg acquisition rate</label>
+        <div class="val" id="bAcq">28.0%</div>
+      </div>
+      <div class="bench-item">
+        <label>Avg CPE (reference)</label>
+        <div class="val" id="bCPE">$2.95</div>
+      </div>
+      <div class="bench-item">
+        <label>Avg CPA (reference)</label>
+        <div class="val" id="bCPA">$36.41</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Forecasted outputs</div>
+    <div class="grid-2" style="margin-bottom:1rem;">
+      <div class="metric dark">
+        <div class="metric-label">Projected CPE — all-in</div>
+        <div class="metric-value" id="outCPE">—</div>
+        <div class="metric-sub">total cost ÷ forecasted entries</div>
+      </div>
+      <div class="metric dark">
+        <div class="metric-label">Projected CPA — all-in</div>
+        <div class="metric-value" id="outCPA">—</div>
+        <div class="metric-sub">total cost ÷ forecasted members</div>
+      </div>
+    </div>
+    <div class="grid-3">
+      <div class="metric">
+        <div class="metric-label">Forecasted entries</div>
+        <div class="metric-value" id="outEntries">—</div>
+        <div class="metric-sub">avg entries/day × duration</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Forecasted new members</div>
+        <div class="metric-value" id="outMembers">—</div>
+        <div class="metric-sub">avg members/day × duration</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">New members / day</div>
+        <div class="metric-value" id="outMemDay">—</div>
+        <div class="metric-sub">equals avg members/day</div>
+      </div>
+    </div>
+    <div class="note">Forecasted entries and members use avg entries/day and members/day benchmarks multiplied by duration. CPE and CPA reflect total all-in cost (build + prize + media) ÷ forecasted volume. Benchmarks from 38 historical Primo promotions (2022–2026).</div>
+  </div>
+
+</div>
+<script>
+const B = {
+  sweepstakes: { entDay: 488.34, memDay: 20.55, acq: 0.23384, cpe: 80.09,  cpa: 360.49 },
+  receipt:     { entDay: 453.06, memDay: 85.02, acq: 0.27987, cpe: 2.9455, cpa: 36.415 },
+  hybrid:      { entDay: 126.36, memDay: 85.02, acq: 0.20511, cpe: 7.1046, cpa: 27.075 }
+};
+function fmt(n)  { return Math.round(n).toLocaleString('en-US'); }
+function fmtC(n) { return '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+function calc() {
+  const mech  = document.getElementById('mechanic').value;
+  const dur   = parseFloat(document.getElementById('duration').value) || 1;
+  const build = parseFloat(document.getElementById('buildCost').value) || 0;
+  const media = parseFloat(document.getElementById('mediaCost').value) || 0;
+  const total = build + media;
+  const b = B[mech];
+
+  document.getElementById('totalCost').textContent = '$' + fmt(total);
+  document.getElementById('bEntDay').textContent   = b.entDay.toFixed(1);
+  document.getElementById('bMemDay').textContent   = b.memDay.toFixed(1);
+  document.getElementById('bAcq').textContent      = (b.acq * 100).toFixed(1) + '%';
+  document.getElementById('bCPE').textContent      = fmtC(b.cpe);
+  document.getElementById('bCPA').textContent      = fmtC(b.cpa);
+
+  const entries = b.entDay * dur;
+  const members = b.memDay * dur;
+
+  document.getElementById('outEntries').textContent = fmt(entries);
+  document.getElementById('outMembers').textContent = fmt(members);
+  document.getElementById('outMemDay').textContent  = b.memDay.toFixed(1);
+  document.getElementById('outCPE').textContent     = total > 0 ? fmtC(total / entries) : '—';
+  document.getElementById('outCPA').textContent     = total > 0 ? fmtC(total / members) : '—';
+}
+
+['mechanic','duration','buildCost','mediaCost'].forEach(id =>
+  document.getElementById(id).addEventListener('input', calc));
+calc();
+</script>
+</body>
+</html>
